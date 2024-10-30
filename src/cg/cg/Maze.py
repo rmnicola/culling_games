@@ -1,5 +1,4 @@
 import pygame
-import sys
 
 from .Utils.Screen import generate_screen
 
@@ -11,16 +10,16 @@ BLUE = (114, 135, 253)
 
 
 class Maze:
-    def __init__(self, maze_initial_configuration, resolution=720):
-        self.maze = maze_initial_configuration
-        self.screen, self.grid_size = generate_screen(self.maze.copy(),
+    def __init__(self, maze_initial_configuration, resolution):
+        self.occupancy_grid = maze_initial_configuration
+        self.screen, self.grid_size = generate_screen(self.occupancy_grid.copy(),
                                                       resolution)
         self.screen_width, self.screen_height = self.screen.get_size()
 
     def draw(self):
         self.screen.fill(OFFWHITE)  # Black background
         # Draw the maze
-        for i, row in enumerate(self.maze):
+        for i, row in enumerate(self.occupancy_grid):
             for j, cell in enumerate(row):
                 if cell == 'r':
                     color = BLUE
@@ -45,17 +44,6 @@ class Maze:
             pygame.draw.line(self.screen, BLACK, (0, y),
                              (self.screen_width, y))
 
-
-    def run(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-            
-            # Draw the grid each frame
-            self.draw()
-            pygame.display.flip()
-
-        pygame.quit()
-        sys.exit()
+    def set_grid(self, pos, value):
+        x, y = pos
+        self.occupancy_grid[x][y] = value
