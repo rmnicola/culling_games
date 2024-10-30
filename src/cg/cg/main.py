@@ -1,8 +1,9 @@
 import pygame
+from .Utils.Csv import load_from_csv
 from .Maze import Maze
 
 
 def main():
     pygame.init()
-    maze = Maze(grid_size=40)
+    maze = Maze(load_from_csv("maps/default.csv"))
     maze.run()
