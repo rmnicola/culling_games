@@ -3,11 +3,11 @@ import sys
 
 from .Utils.Screen import generate_screen
 
-OFFWHITE = (255, 255, 250)
+OFFWHITE = (220, 224, 232)
 BLACK = (0, 0, 0)
-GREY = (125, 125, 125)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
+GREY = (35, 38, 52)
+RED = (230, 69, 83)
+BLUE = (114, 135, 253)
 
 
 class Maze:
