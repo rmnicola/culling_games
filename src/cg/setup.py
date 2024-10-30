@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'test = cg.teste:main'
+            'test = cg.teste:main',
+            'maze = cg.main:main',
         ],
     },
 )
