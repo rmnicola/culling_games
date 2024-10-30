@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'Culling_Games'
+package_name = 'cg'
 
 setup(
     name=package_name,
@@ -15,11 +15,12 @@ setup(
     zip_safe=True,
     maintainer='rnicola',
     maintainer_email='rodrigo.nicola0@gmail.com',
-    description='TODO: Package description',
+    description='Culling Games',
     license='MIT',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'test = cg.teste:main'
         ],
     },
 )
