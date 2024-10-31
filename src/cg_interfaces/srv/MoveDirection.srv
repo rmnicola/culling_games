@@ -1,0 +1,7 @@
+string direction
+---
+bool success
+string left
+string down
+string up
+string right
