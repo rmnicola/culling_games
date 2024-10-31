@@ -12,7 +12,7 @@ BLUE = (114, 135, 253)
 class Maze:
     def __init__(self, maze_initial_configuration, resolution):
         self.occupancy_grid = maze_initial_configuration
-        self.screen, self.grid_size = generate_screen(self.occupancy_grid.copy(),
+        self.screen, self.cell_size = generate_screen(self.occupancy_grid.copy(),
                                                       resolution)
         self.screen_width, self.screen_height = self.screen.get_size()
 
@@ -30,20 +30,24 @@ class Maze:
                 if cell == 'f':
                     color = OFFWHITE
                 pygame.draw.rect(self.screen, color,
-                                 pygame.Rect(j * self.grid_size, i *
-                                             self.grid_size, self.grid_size,
-                                             self.grid_size))
+                                 pygame.Rect(j * self.cell_size, i *
+                                             self.cell_size, self.cell_size,
+                                             self.cell_size))
 
         # Draw vertical lines
-        for x in range(0, self.screen_width, self.grid_size):
+        for x in range(0, self.screen_width, self.cell_size):
             pygame.draw.line(self.screen, BLACK, (x, 0), (x,
                                                           self.screen_height))
         
         # Draw horizontal lines
-        for y in range(0, self.screen_height, self.grid_size):
+        for y in range(0, self.screen_height, self.cell_size):
             pygame.draw.line(self.screen, BLACK, (0, y),
                              (self.screen_width, y))
 
-    def set_grid(self, pos, value):
+    def set_cell(self, pos, value):
         x, y = pos
         self.occupancy_grid[x][y] = value
+
+    def get_cell(self, pos):
+        x, y = pos
+        return self.occupancy_grid[x][y]

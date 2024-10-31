@@ -28,8 +28,8 @@ class Game:
             new_row -= 1
         new_pos = new_row, new_col
         if not is_obstructed(self.maze.occupancy_grid.copy(), new_pos):
-            self.maze.set_grid(robot_pos, 'f')
-            self.maze.set_grid(new_pos, 'r')
+            self.maze.set_cell(robot_pos, 'f')
+            self.maze.set_cell(new_pos, 'r')
 
     def handle_input(self):
         for event in pygame.event.get():

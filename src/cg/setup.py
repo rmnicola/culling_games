@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'test = cg.teste:main',
-            'maze = cg.main:main',
+            'maze = cg.main:game',
+            'edit = cg.main:editor',
         ],
     },
 )
