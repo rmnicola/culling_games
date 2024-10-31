@@ -1,6 +1,6 @@
 import pygame
 
-from .Utils.Screen import generate_screen
+from .Utils.Screen import generate_screen, display_random_image
 
 OFFWHITE = (220, 224, 232)
 BLACK = (0, 0, 0)
@@ -43,6 +43,9 @@ class Maze:
         for y in range(0, self.screen_height, self.cell_size):
             pygame.draw.line(self.screen, BLACK, (0, y),
                              (self.screen_width, y))
+
+    def win(self):
+        display_random_image(self.screen)
 
     def set_cell(self, pos, value):
         x, y = pos

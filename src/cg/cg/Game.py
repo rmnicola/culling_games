@@ -16,24 +16,31 @@ class Game(Node):
                                        self.handle_move_cmd)
         self.maze = Maze(maze_initial_configuration, resolution)
         self.running = False
+        self.win = False
         self.robot = Robot(self.maze)
 
     def update(self):
         self.handle_input()
-        self.maze.draw()
+        if not self.win:
+            self.maze.draw()
+        else:
+            self.maze.win()
 
     def handle_move_cmd(self, request, response):
         direction = request.direction.lower()
+        target_pos = find(self.maze.get_occupancy_grid(), 't')
         response.success, surroundings = self.robot.move(direction)
+        if target_pos == self.robot.pos:
+            self.win = True
         response.left, response.down, response.up, response.right = surroundings
         response.robot_pos = self.robot.pos
-        response.target_pos = find(self.maze.get_occupancy_grid(), 't')
+        response.target_pos = target_pos
         return response
 
     def handle_input(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.running =False
+                self.running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_h:
                     direction = 'left'
@@ -45,7 +52,10 @@ class Game(Node):
                     direction = 'right'
                 else:
                     return
+                target_pos = find(self.maze.get_occupancy_grid(), 't')
                 success, surroundings = self.robot.move(direction)
+                if target_pos == self.robot.pos:
+                    self.win = True
                 if success:
                     print(f"Robo movido! Robo vê: {surroundings}")
                 else:
