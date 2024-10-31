@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-from cg_interfaces.srv import MoveDirection
+from cg_interfaces.srv import MoveCmd
 from rclpy.node import Node
 
 from .Maze import Maze
@@ -12,7 +12,7 @@ from .Utils.Finders import find
 class Game(Node):
     def __init__(self, maze_initial_configuration, resolution=720):
         super().__init__("Culling_Games")
-        self.srv = self.create_service(MoveDirection, 'move_command',
+        self.srv = self.create_service(MoveCmd, 'move_command',
                                        self.handle_move_cmd)
         self.maze = Maze(maze_initial_configuration, resolution)
         self.running = False
@@ -26,6 +26,8 @@ class Game(Node):
         direction = request.direction.lower()
         response.success, surroundings = self.robot.move(direction)
         response.left, response.down, response.up, response.right = surroundings
+        response.robot_pos = self.robot.pos
+        response.target_pos = find(self.maze.get_occupancy_grid(), 't')
         return response
 
     def handle_input(self):
