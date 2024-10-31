@@ -23,8 +23,6 @@ class Game(Node):
         self.handle_input()
         if not self.win:
             self.maze.draw()
-        else:
-            self.maze.win()
 
     def handle_move_cmd(self, request, response):
         direction = request.direction.lower()
@@ -32,6 +30,7 @@ class Game(Node):
         response.success, surroundings = self.robot.move(direction)
         if target_pos == self.robot.pos:
             self.win = True
+            self.maze.win()
         response.left, response.down, response.up, response.right = surroundings
         response.robot_pos = self.robot.pos
         response.target_pos = target_pos
@@ -56,6 +55,7 @@ class Game(Node):
                 success, surroundings = self.robot.move(direction)
                 if target_pos == self.robot.pos:
                     self.win = True
+                    self.maze.win()
                 if success:
                     print(f"Robo movido! Robo vê: {surroundings}")
                 else:

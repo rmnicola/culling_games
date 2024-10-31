@@ -1,6 +1,7 @@
 import pygame
+import random
 
-from .Utils.Screen import generate_screen, display_random_image
+from .Utils.Screen import generate_screen, display_image, load_images_from_directory
 
 OFFWHITE = (220, 224, 232)
 BLACK = (0, 0, 0)
@@ -15,6 +16,7 @@ class Maze:
         self.screen, self.cell_size = generate_screen(self.occupancy_grid.copy(),
                                                       resolution)
         self.screen_width, self.screen_height = self.screen.get_size()
+        self.image = random.choice(load_images_from_directory())
 
     def draw(self):
         self.screen.fill(OFFWHITE)  # Black background
@@ -45,7 +47,7 @@ class Maze:
                              (self.screen_width, y))
 
     def win(self):
-        display_random_image(self.screen)
+        self.screen = display_image(self.screen, self.image)
 
     def set_cell(self, pos, value):
         x, y = pos
