@@ -20,7 +20,7 @@ class Editor:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-                save_to_csv(self.map_file, self.maze.occupancy_grid.copy())
+                save_to_csv(self.map_file, self.maze.get_occupancy_grid())
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 cell_size = self.maze.cell_size
                 x, y = event.pos

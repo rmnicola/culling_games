@@ -16,7 +16,7 @@ class Game:
         self.maze.draw()
 
     def move_robot(self, direction):
-        robot_pos = find(self.maze.occupancy_grid.copy(), 'r')
+        robot_pos = find(self.maze.get_occupancy_grid(), 'r')
         new_row, new_col = robot_pos
         if direction == 'left':
             new_col -= 1
@@ -27,7 +27,7 @@ class Game:
         if direction == 'up':
             new_row -= 1
         new_pos = new_row, new_col
-        if not is_obstructed(self.maze.occupancy_grid.copy(), new_pos):
+        if not is_obstructed(self.maze.get_occupancy_grid(), new_pos):
             self.maze.set_cell(robot_pos, 'f')
             self.maze.set_cell(new_pos, 'r')
 

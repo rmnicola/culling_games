@@ -51,3 +51,6 @@ class Maze:
     def get_cell(self, pos):
         x, y = pos
         return self.occupancy_grid[x][y]
+
+    def get_occupancy_grid(self):
+        return self.occupancy_grid.copy()
