@@ -2,34 +2,19 @@ import pygame
 import sys
 
 from .Maze import Maze
-from .Utils.Finders import find, is_obstructed
+from .Robot import Robot
+from .Utils.Finders import find
 
 
 class Game:
     def __init__(self, maze_initial_configuration, resolution=720):
         self.maze = Maze(maze_initial_configuration, resolution)
-        pygame.init()
         self.running = False
+        self.robot = Robot(self.maze)
 
     def update(self):
         self.handle_input()
         self.maze.draw()
-
-    def move_robot(self, direction):
-        robot_pos = find(self.maze.get_occupancy_grid(), 'r')
-        new_row, new_col = robot_pos
-        if direction == 'left':
-            new_col -= 1
-        if direction == 'right':
-            new_col += 1
-        if direction == 'down':
-            new_row += 1
-        if direction == 'up':
-            new_row -= 1
-        new_pos = new_row, new_col
-        if not is_obstructed(self.maze.get_occupancy_grid(), new_pos):
-            self.maze.set_cell(robot_pos, 'f')
-            self.maze.set_cell(new_pos, 'r')
 
     def handle_input(self):
         for event in pygame.event.get():
@@ -46,9 +31,14 @@ class Game:
                     direction = 'right'
                 else:
                     return
-                self.move_robot(direction)
+                success, surroundings = self.robot.move(direction)
+                if success:
+                    print(f"Robo movido! Robo vê: {surroundings}")
+                else:
+                    print(f"O movimento falhou! Robo vê: {surroundings}")
         
     def run(self):
+        pygame.init()
         self.running = True
         while self.running:
             self.update()
