@@ -20,6 +20,7 @@ class Game(Node):
         self.maze = Maze(maze_initial_configuration, resolution)
         self.running = False
         self.win = False
+        self.win_handled = False
         self.robot = Robot(self.maze)
 
     def update(self):
@@ -39,7 +40,6 @@ class Game(Node):
         response.success, surroundings = self.robot.move(direction)
         if target_pos == self.robot.pos:
             self.win = True
-            self.maze.win()
         response.left, response.down, response.up, response.right = surroundings
         response.robot_pos = self.robot.pos
         response.target_pos = target_pos
@@ -76,5 +76,10 @@ class Game(Node):
         while self.running:
             self.update()
             pygame.display.flip()
+
+            if self.win and not self.win_handled:
+                self.win_handled = True
+                self.maze.win()
+
         pygame.quit()
         sys.exit()
