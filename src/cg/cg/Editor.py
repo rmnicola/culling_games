@@ -5,7 +5,7 @@ from .Maze import Maze
 from .Utils.Csv import save_to_csv
 
 class Editor:
-    def __init__(self, maze_initial_configuration, map_file="maps/default.csv",
+    def __init__(self, maze_initial_configuration, map_file="culling_games/maps/default.csv",
                  resolution=720):
         self.maze = Maze(maze_initial_configuration, resolution)
         pygame.init()

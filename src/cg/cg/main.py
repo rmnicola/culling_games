@@ -8,7 +8,7 @@ from .Editor import Editor
 
 def game():
     rclpy.init()
-    game = Game(load_from_csv("maps/default.csv"))
+    game = Game(load_from_csv("culling_games/maps/default.csv"))
     thread = threading.Thread(target=rclpy.spin, args=(game,))
     thread.start()
 
@@ -23,5 +23,5 @@ def game():
         thread.join()
 
 def editor():
-    editor = Editor(load_from_csv("maps/default.csv"))
+    editor = Editor(load_from_csv("culling_games/maps/default.csv"))
     editor.run()

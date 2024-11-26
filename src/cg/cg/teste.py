@@ -8,7 +8,7 @@ def main():
     black = 0, 0, 0
 
     screen = pygame.display.set_mode(size)
-    ball = pygame.image.load("lobotomy_kaisen/intro_ball.gif")
+    ball = pygame.image.load("culling_games/lobotomy_kaisen/intro_ball.gif")
     ballrect = ball.get_rect()
     while True:
         for event in pygame.event.get():
