@@ -9,7 +9,7 @@ def generate_screen(maze, resolution):
     pygame.display.set_caption("Culling Games")
     return screen, grid_size
 
-def load_images_from_directory(directory="lobotomy_kaisen"):
+def load_images_from_directory(directory="culling_games/lobotomy_kaisen"):
     images = []
     for filename in os.listdir(directory):
         if filename.endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
