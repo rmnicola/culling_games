@@ -3,13 +3,18 @@ import os
 
 max_screen_width, max_screen_height = 800, 600  # Adjust if needed
 
+from ament_index_python.packages import get_package_share_directory
+
 def generate_screen(maze, resolution):
     grid_size = resolution // len(maze)
     screen = pygame.display.set_mode(size=(resolution, resolution))
     pygame.display.set_caption("Culling Games")
     return screen, grid_size
 
-def load_images_from_directory(directory="culling_games/lobotomy_kaisen"):
+def load_images_from_directory(directory=None):
+    if directory is None:
+        pkg_share_dir = get_package_share_directory('cg')
+        directory = os.path.join(pkg_share_dir, 'lobotomy_kaisen')
     images = []
     for filename in os.listdir(directory):
         if filename.endswith((".png", ".jpg", ".jpeg", ".bmp", ".gif")):
