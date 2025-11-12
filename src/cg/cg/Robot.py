@@ -7,11 +7,18 @@ class Robot:
         self.surroundings = self.check_surroundings()
 
     def check_surroundings(self):
-        left = self.maze.get_cell((self.pos[0], self.pos[1]-1))
-        down = self.maze.get_cell((self.pos[0]+1, self.pos[1]))
-        up = self.maze.get_cell((self.pos[0]-1, self.pos[1]))
-        right = self.maze.get_cell((self.pos[0], self.pos[1]+1))
-        return left, down, up, right
+        row, col = self.pos
+        surroundings = {
+            'up': self.maze.get_cell((row - 1, col)),
+            'down': self.maze.get_cell((row + 1, col)),
+            'left': self.maze.get_cell((row, col - 1)),
+            'right': self.maze.get_cell((row, col + 1)),
+            'up_left': self.maze.get_cell((row - 1, col - 1)),
+            'up_right': self.maze.get_cell((row - 1, col + 1)),
+            'down_left': self.maze.get_cell((row + 1, col - 1)),
+            'down_right': self.maze.get_cell((row + 1, col + 1)),
+        }
+        return surroundings
 
     def move(self, direction):
         new_row, new_col = self.pos
@@ -29,5 +36,5 @@ class Robot:
             self.maze.set_cell(new_pos, 'r')
             self.pos = find(self.maze.get_occupancy_grid(), 'r')
             self.surroundings = self.check_surroundings()
-            return True, self.surroundings
-        return False, self.surroundings
+            return True
+        return False

@@ -2,6 +2,7 @@ import pygame
 import sys
 
 from cg_interfaces.srv import MoveCmd, GetMap
+from cg_interfaces.msg import RobotSensors
 from rclpy.node import Node
 
 from .Maze import Maze
@@ -17,11 +18,26 @@ class Game(Node):
                                        self.handle_move_cmd)
         self.srv = self.create_service(GetMap, 'get_map',
                                        self.handle_map_request)
+        self.publisher_ = self.create_publisher(RobotSensors, '/culling_games/robot_sensors', 10)
+        self.timer = self.create_timer(0.5, self.publish_sensor_data)
         self.maze = Maze(maze_initial_configuration, resolution)
         self.running = False
         self.win = False
         self.win_handled = False
         self.robot = Robot(self.maze)
+
+    def publish_sensor_data(self):
+        msg = RobotSensors()
+        surroundings = self.robot.check_surroundings()
+        msg.up = surroundings['up']
+        msg.down = surroundings['down']
+        msg.left = surroundings['left']
+        msg.right = surroundings['right']
+        msg.up_left = surroundings['up_left']
+        msg.up_right = surroundings['up_right']
+        msg.down_left = surroundings['down_left']
+        msg.down_right = surroundings['down_right']
+        self.publisher_.publish(msg)
 
     def update(self):
         self.handle_input()
@@ -37,10 +53,9 @@ class Game(Node):
     def handle_move_cmd(self, request, response):
         direction = request.direction.lower()
         target_pos = find(self.maze.get_occupancy_grid(), 't')
-        response.success, surroundings = self.robot.move(direction)
+        response.success = self.robot.move(direction)
         if target_pos == self.robot.pos:
             self.win = True
-        response.left, response.down, response.up, response.right = surroundings
         response.robot_pos = self.robot.pos
         response.target_pos = target_pos
         return response
@@ -61,14 +76,10 @@ class Game(Node):
                 else:
                     return
                 target_pos = find(self.maze.get_occupancy_grid(), 't')
-                success, surroundings = self.robot.move(direction)
+                success = self.robot.move(direction)
                 if target_pos == self.robot.pos:
                     self.win = True
                     self.maze.win()
-                if success:
-                    print(f"Robo movido! Robo vê: {surroundings}")
-                else:
-                    print(f"O movimento falhou! Robo vê: {surroundings}")
         
     def run(self):
         pygame.init()
