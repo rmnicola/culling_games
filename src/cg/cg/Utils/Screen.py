@@ -24,25 +24,12 @@ def load_images_from_directory(directory=None):
 
 # Display a random image centered on the screen
 def display_image(screen, image):
-    system_screen_info = pygame.display.Info()
-    system_screen_width, system_screen_height = system_screen_info.current_w, system_screen_info.current_h
-    image_width, image_height = image.get_size()
-
-    # Check if the image height is larger than the system screen height
-    if image_height > system_screen_height:
-        # Calculate the scaling factor to resize the image while keeping aspect ratio
-        scale_factor = system_screen_height / image_height
-        image_width = int(image_width * scale_factor)
-        image_height = system_screen_height
-        image = pygame.transform.scale(image, (image_width, image_height))
-
-    # Resize the pygame screen to match the image size and center it on the system screen
-    screen = pygame.display.set_mode((image_width, image_height))
-    os.environ['SDL_VIDEO_CENTERED'] = '1'  # Center the window on the system screen
-    pygame.display.set_mode((image_width, image_height))
-
-    # Center the image on the screen
-    image_rect = image.get_rect(center=(image_width // 2, image_height // 2))
+    screen_rect = screen.get_rect()
+    scaled_image = pygame.transform.scale(image, (screen_rect.width, screen_rect.height))
+    image_rect = scaled_image.get_rect()
+    image_rect.center = screen_rect.center
+    
     screen.fill((0, 0, 0))  # Fill the screen with a black background
-    screen.blit(image, image_rect)
+    screen.blit(scaled_image, image_rect)
     pygame.display.flip()
+    return screen
