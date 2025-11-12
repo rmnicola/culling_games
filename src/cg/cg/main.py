@@ -1,6 +1,7 @@
 import rclpy
 import threading
 import os
+import random
 from ament_index_python.packages import get_package_share_directory
 
 from .Utils.Csv import load_from_csv
@@ -11,7 +12,9 @@ from .Editor import Editor
 def game():
     rclpy.init()
     share_dir = get_package_share_directory('cg')
-    map_path = os.path.join(share_dir, 'maps', 'default.csv')
+    map_number = random.randint(1, 10)
+    map_name = f"{map_number}.csv"
+    map_path = os.path.join(share_dir, 'maps', map_name)
     game = Game(map_path)
     thread = threading.Thread(target=rclpy.spin, args=(game,))
     thread.start()
