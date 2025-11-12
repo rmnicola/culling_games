@@ -12,18 +12,17 @@ def game():
     rclpy.init()
     share_dir = get_package_share_directory('cg')
     map_path = os.path.join(share_dir, 'maps', 'default.csv')
-    game = Game(load_from_csv(map_path))
+    game = Game(map_path)
     thread = threading.Thread(target=rclpy.spin, args=(game,))
     thread.start()
 
     try:
-        while rclpy.ok():
-            game.run()
+        game.run()
     except KeyboardInterrupt:
-        pass
+        game.get_logger().info('KeyboardInterrupt received, shutting down.')
     finally:
-        game.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
         thread.join()
 
 def editor():

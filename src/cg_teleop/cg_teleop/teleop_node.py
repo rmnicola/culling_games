@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from cg_interfaces.srv import MoveCmd
+from cg_interfaces.srv import MoveCmd, Reset
 
 import sys
 import termios
@@ -18,6 +18,8 @@ For non-Vim users:
    w/s: up/down
    a/d: left/right
 
+r : reset the board
+
 q/z : increase/decrease max speeds by 10%
 anything else : stop
 
@@ -27,14 +29,25 @@ CTRL-C to quit
 class TeleopKeyboard(Node):
     def __init__(self):
         super().__init__('teleop_keyboard')
-        self.cli = self.create_client(MoveCmd, '/move_command')
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
-        self.req = MoveCmd.Request()
+        self.move_cli = self.create_client(MoveCmd, '/move_command')
+        self.reset_cli = self.create_client(Reset, '/reset')
+        
+        while not self.move_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Move service not available, waiting again...')
+        while not self.reset_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Reset service not available, waiting again...')
+            
+        self.move_req = MoveCmd.Request()
+        self.reset_req = Reset.Request()
 
-    def send_request(self, direction):
-        self.req.direction = direction
-        self.future = self.cli.call_async(self.req)
+    def send_move_request(self, direction):
+        self.move_req.direction = direction
+        self.future = self.move_cli.call_async(self.move_req)
+        rclpy.spin_until_future_complete(self, self.future)
+        return self.future.result()
+
+    def send_reset_request(self):
+        self.future = self.reset_cli.call_async(self.reset_req)
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
 
@@ -61,11 +74,17 @@ def main(args=None):
             direction = 'left'
         elif key in ['d', 'l', '\x1b[C']:  # d, l, right arrow
             direction = 'right'
+        elif key == 'r':
+            response = teleop_node.send_reset_request()
+            if response.success:
+                teleop_node.get_logger().info('Successfully reset the board')
+            else:
+                teleop_node.get_logger().info('Failed to reset the board')
         elif key == '\x03':  # ctrl-c
             break
         
         if direction:
-            response = teleop_node.send_request(direction)
+            response = teleop_node.send_move_request(direction)
             if response.success:
                 teleop_node.get_logger().info(f'Successfully moved {direction}')
             else:

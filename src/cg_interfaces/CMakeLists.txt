@@ -13,6 +13,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     "srv/MoveCmd.srv"
     "srv/GetMap.srv"
     "msg/RobotSensors.msg"
+    "srv/Reset.srv"
 )
 
 ament_package()

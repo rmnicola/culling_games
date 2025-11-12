@@ -1,7 +1,9 @@
 import pygame
 import sys
+import threading
 
-from cg_interfaces.srv import MoveCmd, GetMap
+import rclpy
+from cg_interfaces.srv import MoveCmd, GetMap, Reset
 from cg_interfaces.msg import RobotSensors
 from rclpy.node import Node
 
@@ -9,22 +11,39 @@ from .Maze import Maze
 from .Robot import Robot
 from .Utils.Finders import find
 from .Utils.Grid import flatten
+from .Utils.Csv import load_from_csv
 
 
 class Game(Node):
-    def __init__(self, maze_initial_configuration, resolution=720):
+    def __init__(self, map_path, resolution=720):
         super().__init__("Culling_Games")
-        self.srv = self.create_service(MoveCmd, 'move_command',
-                                       self.handle_move_cmd)
-        self.srv = self.create_service(GetMap, 'get_map',
-                                       self.handle_map_request)
+        self.map_path = map_path
+        self.resolution = resolution
+        
+        self.move_cmd_service = self.create_service(MoveCmd, 'move_command', self.handle_move_cmd)
+        self.get_map_service = self.create_service(GetMap, 'get_map', self.handle_map_request)
+        self.reset_service = self.create_service(Reset, 'reset', self.handle_reset_request)
+        
         self.publisher_ = self.create_publisher(RobotSensors, '/culling_games/robot_sensors', 10)
         self.timer = self.create_timer(0.5, self.publish_sensor_data)
-        self.maze = Maze(maze_initial_configuration, resolution)
+        
+        initial_maze_config = load_from_csv(self.map_path)
+        self.maze = Maze(initial_maze_config, self.resolution)
+        self.robot = Robot(self.maze)
+        
         self.running = False
         self.win = False
         self.win_handled = False
-        self.robot = Robot(self.maze)
+        
+        self.reset_requested = False
+        self.state_lock = threading.Lock()
+
+    def handle_reset_request(self, request, response):
+        with self.state_lock:
+            self.get_logger().info('Reset request received.')
+            self.reset_requested = True
+        response.success = True
+        return response
 
     def publish_sensor_data(self):
         msg = RobotSensors()
@@ -40,6 +59,16 @@ class Game(Node):
         self.publisher_.publish(msg)
 
     def update(self):
+        with self.state_lock:
+            if self.reset_requested:
+                self.get_logger().info('Resetting the game board from file...')
+                new_maze_config = load_from_csv(self.map_path)
+                self.maze = Maze(new_maze_config, self.resolution)
+                self.robot = Robot(self.maze)
+                self.win = False
+                self.win_handled = False
+                self.reset_requested = False
+
         self.handle_input()
         if not self.win:
             self.maze.draw()
@@ -84,7 +113,7 @@ class Game(Node):
     def run(self):
         pygame.init()
         self.running = True
-        while self.running:
+        while self.running and rclpy.ok():
             self.update()
             pygame.display.flip()
 
@@ -93,4 +122,3 @@ class Game(Node):
                 self.maze.win()
 
         pygame.quit()
-        sys.exit()
