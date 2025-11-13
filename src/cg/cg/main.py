@@ -12,9 +12,14 @@ from .Editor import Editor
 def game():
     rclpy.init()
     share_dir = get_package_share_directory('cg')
-    map_number = random.randint(1, 10)
-    map_name = f"{map_number}.csv"
-    map_path = os.path.join(share_dir, 'maps', map_name)
+    maps_dir = os.path.join(share_dir, 'maps')
+    available_maps = [f for f in os.listdir(maps_dir) if f.endswith('.csv')]
+    if not available_maps:
+        raise FileNotFoundError("No map files (.csv) found in the maps directory.")
+    
+    map_name = random.choice(available_maps)
+    map_path = os.path.join(maps_dir, map_name)
+    
     game = Game(map_path)
     thread = threading.Thread(target=rclpy.spin, args=(game,))
     thread.start()

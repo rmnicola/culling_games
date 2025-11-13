@@ -18,7 +18,8 @@ For non-Vim users:
    w/s: up/down
    a/d: left/right
 
-r : reset the board
+r : reset the current board
+n : start a new random board
 
 q/z : increase/decrease max speeds by 10%
 anything else : stop
@@ -38,7 +39,6 @@ class TeleopKeyboard(Node):
             self.get_logger().info('Reset service not available, waiting again...')
             
         self.move_req = MoveCmd.Request()
-        self.reset_req = Reset.Request()
 
     def send_move_request(self, direction):
         self.move_req.direction = direction
@@ -46,8 +46,10 @@ class TeleopKeyboard(Node):
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
 
-    def send_reset_request(self):
-        self.future = self.reset_cli.call_async(self.reset_req)
+    def send_reset_request(self, is_random=False):
+        reset_req = Reset.Request()
+        reset_req.is_random = is_random
+        self.future = self.reset_cli.call_async(reset_req)
         rclpy.spin_until_future_complete(self, self.future)
         return self.future.result()
 
@@ -75,11 +77,17 @@ def main(args=None):
         elif key in ['d', 'l', '\x1b[C']:  # d, l, right arrow
             direction = 'right'
         elif key == 'r':
-            response = teleop_node.send_reset_request()
+            response = teleop_node.send_reset_request(is_random=False)
             if response.success:
-                teleop_node.get_logger().info('Successfully reset the board')
+                teleop_node.get_logger().info(f'Successfully reset board to map: {response.loaded_map_name}')
             else:
                 teleop_node.get_logger().info('Failed to reset the board')
+        elif key == 'n':
+            response = teleop_node.send_reset_request(is_random=True)
+            if response.success:
+                teleop_node.get_logger().info(f'Successfully loaded new random map: {response.loaded_map_name}')
+            else:
+                teleop_node.get_logger().info('Failed to load new random map')
         elif key == '\x03':  # ctrl-c
             break
         

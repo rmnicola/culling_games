@@ -10,6 +10,10 @@ from rclpy.node import Node
 from .Maze import Maze
 from .Robot import Robot
 from .Utils.Finders import find
+import os
+import random
+from ament_index_python.packages import get_package_share_directory
+
 from .Utils.Grid import flatten
 from .Utils.Csv import load_from_csv
 
@@ -40,9 +44,29 @@ class Game(Node):
 
     def handle_reset_request(self, request, response):
         with self.state_lock:
-            self.get_logger().info('Reset request received.')
+            self.get_logger().info(f'Reset request received: is_random={request.is_random}, map_name={request.map_name}')
+            if request.is_random:
+                maps_dir = os.path.dirname(self.map_path)
+                available_maps = [f for f in os.listdir(maps_dir) if f.endswith('.csv')]
+                if available_maps:
+                    new_map_name = random.choice(available_maps)
+                    self.map_path = os.path.join(maps_dir, new_map_name)
+                    self.get_logger().info(f'Randomly selected new map: {new_map_name}')
+            elif request.map_name:
+                maps_dir = os.path.dirname(self.map_path)
+                new_map_path = os.path.join(maps_dir, request.map_name)
+                if os.path.exists(new_map_path):
+                    self.map_path = new_map_path
+                    self.get_logger().info(f'Switching to map: {request.map_name}')
+                else:
+                    self.get_logger().error(f'Requested map not found: {request.map_name}')
+                    response.success = False
+                    response.loaded_map_name = os.path.basename(self.map_path)
+                    return response
+
             self.reset_requested = True
-        response.success = True
+            response.success = True
+            response.loaded_map_name = os.path.basename(self.map_path)
         return response
 
     def publish_sensor_data(self):
@@ -61,7 +85,7 @@ class Game(Node):
     def update(self):
         with self.state_lock:
             if self.reset_requested:
-                self.get_logger().info('Resetting the game board from file...')
+                self.get_logger().info(f'Resetting game with map: {os.path.basename(self.map_path)}')
                 new_maze_config = load_from_csv(self.map_path)
                 self.maze = Maze(new_maze_config, self.resolution)
                 self.robot = Robot(self.maze)
