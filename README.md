@@ -22,14 +22,30 @@ source install/setup.bash
 ## 2. Executando o Jogo
 
 O jogo principal é uma janela Pygame que exibe o labirinto e o movimento do
-robô. Ao iniciar, um labirinto aleatório do diretório `src/cg/maps` será
-carregado.
+robô.
 
 Para iniciar o jogo, execute o seguinte comando em um terminal:
 
 ```bash
 ros2 run cg maze
 ```
+
+### Opções de Carregamento do Labirinto
+
+Você pode especificar como o labirinto é carregado usando argumentos adicionais:
+
+*   **Carregar um Labirinto Aleatório (Padrão):** Se nenhum argumento for fornecido, o jogo selecionará um labirinto aleatório do diretório `src/cg/maps`.
+    ```bash
+    ros2 run cg maze
+    ```
+*   **Carregar um Labirinto Específico:** Para carregar um labirinto pelo nome do arquivo (por exemplo, `test.csv`):
+    ```bash
+    ros2 run cg maze -- --map test.csv
+    ```
+*   **Gerar um Novo Labirinto:** Para gerar um novo labirinto aleatório e usá-lo imediatamente (esta opção tem precedência sobre `--map`):
+    ```bash
+    ros2 run cg maze -- --generate
+    ```
 
 ## 3. Controlando o Robô
 
