@@ -104,6 +104,14 @@ class Game(Node):
         return response
 
     def handle_move_cmd(self, request, response):
+        if self.win:
+            self.get_logger().warn('Game has already been won, ignoring move command.')
+            response.success = False
+            response.robot_pos = self.robot.pos
+            # Target no longer exists, so use robot's final position.
+            response.target_pos = self.robot.pos
+            return response
+
         direction = request.direction.lower()
         target_pos = find(self.maze.get_occupancy_grid(), 't')
         response.success = self.robot.move(direction)
