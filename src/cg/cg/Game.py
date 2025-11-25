@@ -29,7 +29,7 @@ class Game(Node):
         self.reset_service = self.create_service(Reset, 'reset', self.handle_reset_request)
         
         self.publisher_ = self.create_publisher(RobotSensors, '/culling_games/robot_sensors', 10)
-        self.timer = self.create_timer(0.5, self.publish_sensor_data)
+        self.timer = self.create_timer(0.01, self.publish_sensor_data)
         
         initial_maze_config = load_from_csv(self.map_path)
         self.maze = Maze(initial_maze_config, self.resolution)
