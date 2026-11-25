@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'teleop_keyboard = cg_teleop.teleop_node:main',
+            'autonomous = cg_teleop.autonomous_node:main',
         ],
     },
 )
